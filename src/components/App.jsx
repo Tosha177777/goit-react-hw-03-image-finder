@@ -15,7 +15,7 @@ export class App extends Component {
       data: '',
     },
     page: 1,
-    perPage: 12,
+    perPage: 150,
     images: null,
     isLoading: false,
     totalHits: 0,
@@ -61,7 +61,6 @@ export class App extends Component {
           page === 1 ? images.hits : [...prevState.images, ...images.hits],
         loadMore: page < Math.ceil(images.totalHits / perPage),
       }));
-      console.log('images: ', images);
     } catch (error) {
       console.error(error);
     } finally {
