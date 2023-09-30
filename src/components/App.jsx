@@ -4,6 +4,7 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 import Button from './Button/Button';
 import fetchImages from 'components/Service/api';
+import { ColorRing } from 'react-loader-spinner';
 
 export class App extends Component {
   state = {
@@ -23,11 +24,11 @@ export class App extends Component {
     this.fetchAllImages();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_, prevState) {
     if (
       this.state.page !== prevState.page ||
       this.state.input !== prevState.input ||
-      this.state.page !== 1
+      this.state.page !== prevState.page
     ) {
       this.fetchAllImages();
     }
@@ -36,6 +37,12 @@ export class App extends Component {
   fetchAllImages = async () => {
     const { page, perPage, input } = this.state;
     try {
+      if (page === 1) {
+        this.setState({ images: [] });
+      }
+      this.setState({
+        isLoading: true,
+      });
       const images = await fetchImages(page, perPage, input);
       this.setState(prevState => ({
         images: [...prevState.images, ...images.hits],
@@ -43,6 +50,10 @@ export class App extends Component {
       console.log('images: ', images);
     } catch (error) {
       console.error(error);
+    } finally {
+      this.setState({
+        isLoading: false,
+      });
     }
   };
 
@@ -53,6 +64,7 @@ export class App extends Component {
 
     this.setState({
       input,
+      page: 1,
     });
   };
 
@@ -69,10 +81,11 @@ export class App extends Component {
     return (
       <div>
         <Searchbar handleSubmit={this.handleSubmit} />
+        <ColorRing visible={this.state.isLoading} />
         <ImageGallery>
           <ImageGalleryItem images={images} showImages={showImages} />
-          <Button handleClick={this.handleClick} />
         </ImageGallery>
+        <Button handleClick={this.handleClick} showImages={showImages} />
       </div>
     );
   }
