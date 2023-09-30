@@ -101,14 +101,14 @@ export class App extends Component {
             showImages={showImages}
             onToggleModal={this.onToggleModal}
           />
+          {this.state.loadMore && (
+            <Button handleClick={this.handleClick} showImages={showImages} />
+          )}
         </ImageGallery>
-        {this.state.loadMore && (
-          <Button handleClick={this.handleClick} showImages={showImages} />
-        )}
+
         {this.state.modal.isOpened && (
           <Modal data={this.state.modal.data} onClose={this.onToggleModal} />
         )}
-        {/* <Modal /> */}
       </div>
     );
   }
