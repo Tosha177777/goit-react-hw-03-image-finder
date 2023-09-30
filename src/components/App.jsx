@@ -15,7 +15,7 @@ export class App extends Component {
       data: '',
     },
     page: 1,
-    perPage: 150,
+    perPage: 12,
     images: null,
     isLoading: false,
     totalHits: 0,
