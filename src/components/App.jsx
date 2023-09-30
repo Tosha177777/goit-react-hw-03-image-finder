@@ -5,19 +5,21 @@ import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 import Button from './Button/Button';
 import fetchImages from 'components/Service/api';
 import { ColorRing } from 'react-loader-spinner';
+import Modal from './Modal/Modal';
 
 export class App extends Component {
   state = {
     input: '',
     modal: {
       isOpened: false,
+      data: '',
     },
     page: 1,
     perPage: 12,
-    images: [],
+    images: null,
     isLoading: false,
-    error: null,
-    total: 0,
+    totalHits: 0,
+    loadMore: true,
   };
 
   componentDidMount() {
@@ -34,18 +36,30 @@ export class App extends Component {
     }
   }
 
+  onToggleModal = modalData => {
+    this.setState(prevState => ({
+      modal: {
+        isOpened: !prevState.modal.isOpened,
+        data: modalData,
+      },
+    }));
+  };
+
   fetchAllImages = async () => {
-    const { page, perPage, input } = this.state;
+    const { page, perPage, input, totalHits } = this.state;
     try {
       if (page === 1) {
-        this.setState({ images: [] });
+        this.setState({ images: null });
       }
       this.setState({
         isLoading: true,
       });
       const images = await fetchImages(page, perPage, input);
       this.setState(prevState => ({
-        images: [...prevState.images, ...images.hits],
+        totalHits: images.totalHits,
+        images:
+          page === 1 ? images.hits : [...prevState.images, ...images.hits],
+        loadMore: page < Math.ceil(images.totalHits / perPage),
       }));
       console.log('images: ', images);
     } catch (error) {
@@ -83,9 +97,19 @@ export class App extends Component {
         <Searchbar handleSubmit={this.handleSubmit} />
         <ColorRing visible={this.state.isLoading} />
         <ImageGallery>
-          <ImageGalleryItem images={images} showImages={showImages} />
+          <ImageGalleryItem
+            images={images}
+            showImages={showImages}
+            onToggleModal={this.onToggleModal}
+          />
         </ImageGallery>
-        <Button handleClick={this.handleClick} showImages={showImages} />
+        {this.state.loadMore && (
+          <Button handleClick={this.handleClick} showImages={showImages} />
+        )}
+        {this.state.modal.isOpened && (
+          <Modal data={this.state.modal.data} onClose={this.onToggleModal} />
+        )}
+        {/* <Modal /> */}
       </div>
     );
   }
