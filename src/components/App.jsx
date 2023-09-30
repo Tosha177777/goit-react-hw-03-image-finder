@@ -46,7 +46,7 @@ export class App extends Component {
   };
 
   fetchAllImages = async () => {
-    const { page, perPage, input, totalHits } = this.state;
+    const { page, perPage, input } = this.state;
     try {
       if (page === 1) {
         this.setState({ images: null });
